@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบผู้จัดการฝ่ายพาณิชย์ & สต็อกเรือนเพาะชำ (E-Commerce & Sales Portal) | Udon Thani Expo 2026</title>
+  <meta name="description" content="ระบบจัดการสต็อกต้นไม้ คำสั่งซื้อ และไปป์ไลน์ลูกค้าผู้สนใจ งานมหกรรมพืชสวนโลก 2569">
+  <meta name="theme-color" content="#E6007E">
+
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- LPAMS Core Data Bridge Layer -->
+  <script src="api_bridge.js"></script>
+
+  <style>
+    :root {
+      --primary: #E6007E;
+      --primary-dark: #b80065;
+      --primary-light: #ff3399;
+      --primary-soft: #fde6f2;
+      
+      --secondary: #00A950;
+      --secondary-soft: #e6f7ee;
+      
+      --navy-sidebar: #1e1b4b;
+      --navy-hover: #312e81;
+      
+      --bg-canvas: #fdf2f8;
+      --bg-card: #ffffff;
+      --bg-surface: #f8fafc;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-card: 0 4px 16px rgba(230, 0, 126, 0.08);
+      --shadow-modal: 0 20px 45px rgba(0,0,0,0.25);
+      
+      --font-heading: 'Plus Jakarta Sans', 'Prompt', sans-serif;
+      --font-body: 'Prompt', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .sales-sidebar {
+      width: 260px;
+      background: var(--navy-sidebar);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 50;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .brand-section {
+      padding: 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #E6007E 0%, #ff3399 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(230, 0, 126, 0.4);
+    }
+
+    .sidebar-menu {
+      padding: 16px 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .menu-header {
+      font-size: 10px;
+      font-weight: 700;
+      color: #f472b6;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 10px 12px 4px;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: #fce7f3;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: var(--navy-hover);
+      color: #ffffff;
+    }
+    .menu-item.active {
+      background: rgba(230, 0, 126, 0.25);
+      color: #ffffff;
+      font-weight: 700;
+      border-left: 4px solid var(--primary);
+    }
+
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-switch-portal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-size: 11.5px;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+    .btn-switch-portal:hover { background: rgba(255,255,255,0.25); }
+
+    /* Main Content */
+    .sales-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sales-topbar {
+      height: 60px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .btn-hamburger {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 15px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .sales-content {
+      padding: 24px;
+      flex: 1;
+    }
+
+    /* Views */
+    .sales-view {
+      display: none;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    .sales-view.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Tables */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-left: 4px solid var(--kpi-color, var(--primary));
+    }
+    .kpi-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--text-main); line-height: 1.1; margin: 4px 0 2px; }
+    .kpi-sub { font-size: 10px; color: var(--text-muted); }
+    .kpi-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--kpi-bg, var(--primary-soft));
+      color: var(--kpi-color, var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.data-table th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    table.data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.data-table tr:hover { background: #f8fafc; }
+
+    /* Badges & Buttons */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-completed { background: #dcfce7; color: #15803d; }
+    .badge-in_progress { background: #e0f2fe; color: #0369a1; }
+    .badge-new { background: #fef3c7; color: #b45309; }
+    .badge-contacted { background: #ede9fe; color: #6d28d9; }
+    .badge-cancelled { background: #fee2e2; color: #b91c1c; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn-primary { background: var(--primary); color: #ffffff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg-surface); }
+
+    /* Filter */
+    .filter-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 6px 12px;
+      gap: 8px;
+      width: 260px;
+    }
+    .search-input-wrap input { border: none; outline: none; font-size: 12px; width: 100%; font-family: inherit; }
+
+    /* Mobile Bottom Navigation */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      z-index: 900;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .mob-nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--text-muted);
+      font-size: 9.5px;
+      font-weight: 600;
+      flex: 1;
+      padding: 6px 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .mob-nav-btn.active { color: var(--primary); font-weight: 800; }
+    .mob-nav-btn i { font-size: 17px; }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .btn-hamburger { display: flex; }
+      .sales-sidebar {
+        position: fixed;
+        left: 0; top: 0; bottom: 0;
+        z-index: 1000;
+        transform: translateX(-100%);
+      }
+      .sales-sidebar.open { transform: translateX(0); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+      .sales-content { padding: 14px 12px 75px; }
+      .mobile-nav { display: flex; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .filter-toolbar { flex-direction: column; align-items: stretch; }
+      .search-input-wrap { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Backdrop -->
+  <div id="sidebarBackdrop" onclick="toggleSidebar(false)" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:998; display:none;"></div>
+
+  <!-- Sidebar -->
+  <aside class="sales-sidebar">
+    <div class="brand-section">
+      <div class="brand-icon">🛍️</div>
+      <div>
+        <h1 style="font-size:13.5px; font-weight:800; color:#fff;">ฝ่ายพาณิชย์ & สต็อก</h1>
+        <p style="font-size:9.5px; color:#fbcfe8;">E-Commerce & Nursery Sales</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-header">ศูนย์การขาย & รายได้</div>
+      <a class="menu-item active" onclick="switchTab('dashboard')">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>แดชบอร์ดยอดขาย</span>
+      </a>
+      <a class="menu-item" onclick="switchTab('leads')">
+        <i class="fa-solid fa-users-viewfinder"></i>
+        <span>ผู้สนใจซื้อ (Leads CRM)</span>
+      </a>
+
+      <div class="menu-header">สินค้า & สต็อกเรือนเพาะชำ</div>
+      <a class="menu-item" onclick="switchTab('stock')">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <span>สต็อกเรือนเพาะชำ</span>
+      </a>
+      <a class="menu-item" onclick="switchTab('catalog')">
+        <i class="fa-solid fa-tags"></i>
+        <span>สินค้าในตลาดต้นไม้</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="arborist.html" class="btn-switch-portal">
+        <i class="fa-solid fa-tree" style="color:#34d399;"></i>
+        <span>ไปแอปผู้ดูแลต้นไม้ →</span>
+      </a>
+      <a href="index.html" target="_blank" class="btn-switch-portal" style="background:#E6007E;">
+        <i class="fa-solid fa-mobile-screen"></i>
+        <span>เปิดแอปผู้เข้าชมงาน</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Canvas -->
+  <main class="sales-main">
+    <header class="sales-topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="btn-hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2 style="font-size:15px; font-weight:800;" id="pageTitle">📊 แดชบอร์ดยอดขายและคำสั่งซื้อ</h2>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge" style="background:#fde6f2; color:#E6007E; font-size:11px;">
+          <i class="fa-solid fa-user-tie"></i> คุณศศิธร (Sales & Nursery Manager)
+        </span>
+      </div>
+    </header>
+
+    <div class="sales-content">
+
+      <!-- VIEW 1: SALES DASHBOARD -->
+      <section id="view-dashboard" class="sales-view active">
+        <div class="kpi-grid">
+          <div class="kpi-card" style="--kpi-color:#E6007E; --kpi-bg:#fde6f2;">
+            <div>
+              <p class="kpi-label">ยอดขายสำเร็จรวม</p>
+              <p class="kpi-value" id="kpiRevenue">฿0</p>
+              <p class="kpi-sub">PromptPay & โอนเงิน</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-sack-dollar"></i></div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-color:#0284c7; --kpi-bg:#e0f2fe;">
+            <div>
+              <p class="kpi-label">Leads กำลังติดตาม</p>
+              <p class="kpi-value" id="kpiActiveLeads">0</p>
+              <p class="kpi-sub">ผู้สนใจและขอใบเสนอราคา</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-users-viewfinder"></i></div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-color:#00A950; --kpi-bg:#dcfce7;">
+            <div>
+              <p class="kpi-label">สต็อกต้นไม้พร้อมส่ง</p>
+              <p class="kpi-value" id="kpiTotalStock">0 ต้น</p>
+              <p class="kpi-sub">จาก 7 เรือนเพาะชำในงาน</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-boxes-packing"></i></div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-color:#8b5cf6; --kpi-bg:#ede9fe;">
+            <div>
+              <p class="kpi-label">สแกนสนใจต้นไม้</p>
+              <p class="kpi-value" id="kpiTotalScans">0 ครั้ง</p>
+              <p class="kpi-sub">ผ่าน QR Code ภาคสนาม</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-qrcode"></i></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="font-size:14px; font-weight:800; color:var(--primary);">
+              <i class="fa-solid fa-fire"></i> รายการสั่งซื้อและผู้สนใจล่าสุด (Live Visitor Leads)
+            </h3>
+            <button class="btn btn-primary btn-sm" onclick="switchTab('leads')">ดูทั้งหมด</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" id="recentLeadsTable">
+              <thead>
+                <tr>
+                  <th>เวลา</th>
+                  <th>ลูกค้า</th>
+                  <th>เบอร์โทร</th>
+                  <th>ต้นไม้ / Tree ID</th>
+                  <th>มูลค่า</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: LEADS CRM -->
+      <section id="view-leads" class="sales-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size:14px; font-weight:800;">ไปป์ไลน์ลูกค้าผู้สนใจ (Lead CRM Pipeline)</h3>
+            <p style="font-size:11px; color:var(--text-muted);">ข้อมูลลูกค้าที่กดสั่งซื้อหรือขอราคาจากแอปพลิเคชัน</p>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="fullLeadsTable">
+              <thead>
+                <tr>
+                  <th>วันที่/เวลา</th>
+                  <th>ชื่อลูกค้า</th>
+                  <th>เบอร์โทรติดต่อ</th>
+                  <th>ต้นไม้ที่สนใจ</th>
+                  <th>ประเภท</th>
+                  <th>มูลค่า</th>
+                  <th>สถานะการขาย</th>
+                  <th>บันทึกทีมงาน</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: NURSERY STOCK -->
+      <section id="view-stock" class="sales-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size:14px; font-weight:800;">ระบบสต็อกเรือนเพาะชำ (Nursery Stock Link)</h3>
+            <p style="font-size:11px; color:var(--text-muted);">ปรับปรุงจำนวนสต็อกและราคาขายที่แสดงบนแอปผู้เข้าชม</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('✅ ตรวจนับสต็อกวันนี้เรียบร้อย')">
+            <i class="fa-solid fa-clipboard-check"></i> ยืนยันสต็อกสดใหม่
+          </button>
+        </div>
+
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="stockTable">
+              <thead>
+                <tr>
+                  <th>ชนิดพันธุ์ไม้</th>
+                  <th>Tree ID</th>
+                  <th>เรือนเพาะชำ</th>
+                  <th>สต็อกคงเหลือ</th>
+                  <th>ราคาขาย</th>
+                  <th>สถานะ</th>
+                  <th>ปรับปรุง</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: CATALOG -->
+      <section id="view-catalog" class="sales-view">
+        <div class="filter-toolbar">
+          <h3 style="font-size:14px; font-weight:800;">รายการสินค้าในตลาดต้นไม้หน้าแอป (Marketplace)</h3>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;" id="catalogGrid"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <button class="mob-nav-btn active" id="mob-dashboard" onclick="switchTab('dashboard')">
+      <i class="fa-solid fa-chart-line"></i>
+      <span>ยอดขาย</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-leads" onclick="switchTab('leads')">
+      <i class="fa-solid fa-users-viewfinder"></i>
+      <span>ลูกค้า</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-stock" onclick="switchTab('stock')">
+      <i class="fa-solid fa-boxes-stacked"></i>
+      <span>สต็อก</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-catalog" onclick="switchTab('catalog')">
+      <i class="fa-solid fa-tags"></i>
+      <span>สินค้า</span>
+    </button>
+    <button class="mob-nav-btn" onclick="toggleSidebar(true)">
+      <i class="fa-solid fa-bars"></i>
+      <span>เมนู</span>
+    </button>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast" style="position:fixed; bottom:24px; right:24px; background:#1e1b4b; color:#fff; padding:10px 18px; border-radius:8px; font-size:12.5px; font-weight:700; display:none; z-index:200;">
+    <span id="toastMsg"></span>
+  </div>
+
+  <script>
+    let currentTab = 'dashboard';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+      window.addEventListener('lpams_data_updated', refreshCurrentTab);
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2800);
+    }
+
+    function toggleSidebar(force) {
+      const s = document.querySelector('.sales-sidebar');
+      const b = document.getElementById('sidebarBackdrop');
+      const isOpen = s.classList.contains('open');
+      const target = force !== undefined ? force : !isOpen;
+      s.classList.toggle('open', target);
+      b.style.display = target ? 'block' : 'none';
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.sales-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('active'));
+
+      const target = document.getElementById('view-' + tabId);
+      if (target) target.classList.add('active');
+
+      const mobBtn = document.getElementById('mob-' + tabId);
+      if (mobBtn) mobBtn.classList.add('active');
+
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => {
+        if (m.getAttribute('onclick') && m.getAttribute('onclick').includes(tabId)) m.classList.add('active');
+      });
+
+      if (window.innerWidth <= 992) toggleSidebar(false);
+
+      const titles = {
+        'dashboard': '📊 แดชบอร์ดยอดขายและคำสั่งซื้อ',
+        'leads': '👥 ไปป์ไลน์ลูกค้าผู้สนใจ (Lead CRM)',
+        'stock': '📦 สต็อกเรือนเพาะชำ & การจำหน่าย',
+        'catalog': '🏷️ รายการสินค้าในตลาดต้นไม้หน้าแอป'
+      };
+      document.getElementById('pageTitle').textContent = titles[tabId] || 'E-Commerce Portal';
+      refreshCurrentTab();
+    }
+
+    function refreshCurrentTab() {
+      if (currentTab === 'dashboard') renderDashboard();
+      else if (currentTab === 'leads') renderLeads();
+      else if (currentTab === 'stock') renderStock();
+      else if (currentTab === 'catalog') renderCatalog();
+    }
+
+    function renderDashboard() {
+      const k = LPAMS_API.getDashboardKPIs();
+      const plants = LPAMS_API.getAllPlants();
+      const totalStock = plants.reduce((sum, p) => sum + (Number(p.stockQty) || 0), 0);
+
+      document.getElementById('kpiRevenue').textContent = `฿${k.totalRevenue.toLocaleString()}`;
+      document.getElementById('kpiActiveLeads').textContent = `${k.activeLeadsCount} ราย`;
+      document.getElementById('kpiTotalStock').textContent = `${totalStock} ต้น`;
+      document.getElementById('kpiTotalScans').textContent = `${k.totalScans} ครั้ง`;
+
+      const leads = LPAMS_API.getAllLeads().slice(0, 5);
+      const tbody = document.querySelector('#recentLeadsTable tbody');
+      tbody.innerHTML = leads.map(l => `
+        <tr>
+          <td>${l.timestamp.split(' ')[1] || l.timestamp}</td>
+          <td><b>${l.customerName}</b></td>
+          <td><a href="tel:${l.phone}" style="color:var(--primary); font-weight:700; text-decoration:none;">${l.phone}</a></td>
+          <td>${l.plantName} <span class="badge" style="background:#fde6f2; color:var(--primary);">${l.treeId}</span></td>
+          <td><b>฿${(l.totalThb || 0).toLocaleString()}</b></td>
+          <td><span class="badge badge-${l.status}">${l.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderLeads() {
+      const leads = LPAMS_API.getAllLeads();
+      const tbody = document.querySelector('#fullLeadsTable tbody');
+      tbody.innerHTML = leads.map(l => `
+        <tr>
+          <td>${l.timestamp}</td>
+          <td><b>${l.customerName}</b></td>
+          <td><a href="tel:${l.phone}" style="color:var(--primary); font-weight:700; text-decoration:none;">${l.phone}</a></td>
+          <td>${l.plantName} (${l.treeId})</td>
+          <td><span class="badge ${l.activityType === 'direct_order' ? 'badge-completed' : 'badge-in_progress'}">${l.activityType}</span></td>
+          <td><b>฿${(l.totalThb || 0).toLocaleString()}</b></td>
+          <td>
+            <select class="form-select" style="padding:4px 8px; font-size:11px;" onchange="changeLeadStatus(${l.id}, this.value)">
+              <option value="new" ${l.status === 'new' ? 'selected' : ''}>รอติดต่อ (New)</option>
+              <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>ติดต่อแล้ว (Contacted)</option>
+              <option value="in_progress" ${l.status === 'in_progress' ? 'selected' : ''}>กำลังประสาน (In Progress)</option>
+              <option value="completed" ${l.status === 'completed' ? 'selected' : ''}>ปิดการขาย (Won)</option>
+              <option value="cancelled" ${l.status === 'cancelled' ? 'selected' : ''}>ยกเลิก (Lost)</option>
+            </select>
+          </td>
+          <td>
+            <span style="font-size:11px; color:var(--text-muted);">${l.note || '-'}</span>
+            <button class="btn btn-outline btn-sm" onclick="addNote(${l.id})" style="margin-left:4px;"><i class="fa-solid fa-comment"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function changeLeadStatus(leadId, newStatus) {
+      LPAMS_API.updateLeadStatus(leadId, newStatus);
+      showToast(`📝 อัปเดตสถานะเป็น "${newStatus}" สำเร็จ`);
+    }
+
+    function addNote(leadId) {
+      const note = prompt("เพิ่มบันทึกการคุยกับลูกค้า:");
+      if (note) {
+        LPAMS_API.updateLeadStatus(leadId, undefined, note);
+        showToast("💾 เพิ่มบันทึกเรียบร้อย");
+        renderLeads();
+      }
+    }
+
+    function renderStock() {
+      const plants = LPAMS_API.getAllPlants();
+      const tbody = document.querySelector('#stockTable tbody');
+      tbody.innerHTML = plants.map(p => {
+        const spec = LPAMS_API.getSpeciesById(p.speciesId) || {};
+        return `
+          <tr>
+            <td><b>${spec.nameTh || '-'}</b></td>
+            <td><b style="color:var(--primary);">${p.treeId}</b></td>
+            <td>เรือนเพาะชำโซน ${p.zoneCode}</td>
+            <td><b style="color:${(p.stockQty || 0) < 10 ? '#dc2626' : '#15803d'}; font-size:13px;">${p.stockQty || 0} ต้น</b></td>
+            <td><b style="color:var(--primary);">฿${(p.price || 350).toLocaleString()}</b></td>
+            <td><span class="badge ${(p.stockQty || 0) > 0 ? 'badge-completed' : 'badge-cancelled'}">${(p.stockQty || 0) > 0 ? 'พร้อมส่ง' : 'หมด'}</span></td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="quickEditStock(${p.id}, ${p.stockQty || 0}, ${p.price || 350})">
+                ปรับสต็อก/ราคา
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function quickEditStock(id, currentStock, currentPrice) {
+      const newStock = prompt("ระบุสต็อกคงเหลือใหม่ (ต้น):", currentStock);
+      if (newStock !== null) {
+        const newPrice = prompt("ระบุราคาขายใหม่ (บาท):", currentPrice);
+        const p = LPAMS_API.getPlantById(id);
+        if (p) {
+          p.stockQty = Number(newStock);
+          if (newPrice !== null) p.price = Number(newPrice);
+          LPAMS_API.savePlant(p);
+          showToast("🏪 บันทึกสต็อกและราคาเรียบร้อยแล้ว!");
+          renderStock();
+        }
+      }
+    }
+
+    function renderCatalog() {
+      const plants = LPAMS_API.getPublishedPlants();
+      const container = document.getElementById('catalogGrid');
+      container.innerHTML = plants.map(p => {
+        const spec = LPAMS_API.getSpeciesById(p.speciesId) || {};
+        return `
+          <div class="card" style="padding:12px; margin-bottom:0;">
+            <img src="${p.mainImage}" alt="${spec.nameTh}" style="width:100%; height:130px; border-radius:8px; object-fit:cover; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge" style="background:#fde6f2; color:var(--primary); font-size:10px;">${p.treeId}</span>
+              <span class="badge badge-completed">สต็อก ${p.stockQty || 0} ต้น</span>
+            </div>
+            <h4 style="font-size:13px; font-weight:800; margin:6px 0 2px;">${spec.nameTh || ''}</h4>
+            <p style="font-size:10px; font-style:italic; color:var(--text-muted); margin-bottom:8px;">${spec.nameScientific || ''}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:8px;">
+              <span style="font-size:15px; font-weight:800; color:var(--primary);">฿${(p.price || 350).toLocaleString()}</span>
+              <button class="btn btn-outline btn-sm" onclick="quickEditStock(${p.id}, ${p.stockQty || 0}, ${p.price || 350})">แก้ไข</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

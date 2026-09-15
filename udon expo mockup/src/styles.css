@@ -1,0 +1,147 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+/*
+ * Udon Thani International Horticultural Expo 2026 — design system.
+ * Deep Isan garden green + expo lotus pink. All colors in oklch.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --font-display: "Plus Jakarta Sans", "Noto Sans Thai", system-ui, sans-serif;
+  --font-sans: "Be Vietnam Pro", "Noto Sans Thai", system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-bright: var(--primary-bright);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-marigold: var(--marigold);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-container: var(--surface-container);
+  --shadow-sheet: 0 -8px 28px oklch(0.34 0.075 160 / 0.16);
+  --shadow-card: 0 6px 20px oklch(0.34 0.075 160 / 0.1);
+}
+
+:root {
+  --radius: 0.875rem;
+  --background: oklch(0.985 0.006 150);
+  --foreground: oklch(0.23 0.012 160);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.23 0.012 160);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.23 0.012 160);
+  --primary: oklch(0.36 0.075 160);
+  --primary-foreground: oklch(0.99 0.005 150);
+  --primary-soft: oklch(0.91 0.075 155);
+  --primary-bright: oklch(0.74 0.11 158);
+  --secondary: oklch(0.57 0.21 6);
+  --secondary-foreground: oklch(0.99 0.005 340);
+  --secondary-soft: oklch(0.93 0.045 8);
+  --muted: oklch(0.955 0.008 150);
+  --muted-foreground: oklch(0.52 0.015 160);
+  --accent: oklch(0.95 0.03 155);
+  --accent-foreground: oklch(0.36 0.075 160);
+  --marigold: oklch(0.76 0.16 62);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.9 0.012 155);
+  --input: oklch(0.9 0.012 155);
+  --ring: oklch(0.74 0.11 158);
+  --surface: oklch(0.985 0.006 150);
+  --surface-container: oklch(0.945 0.012 152);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(240px);
+    opacity: 0;
+  }
+}
+
+@utility animate-scan {
+  animation: scan-line 2.4s ease-in-out infinite alternate;
+}
+
+@utility bg-weave {
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 45%,
+      oklch(1 0 0 / 0.06) 45%,
+      oklch(1 0 0 / 0.06) 55%,
+      transparent 0
+    ),
+    linear-gradient(
+      -45deg,
+      transparent 45%,
+      oklch(1 0 0 / 0.06) 45%,
+      oklch(1 0 0 / 0.06) 55%,
+      transparent 0
+    );
+  background-size: 10px 10px;
+}

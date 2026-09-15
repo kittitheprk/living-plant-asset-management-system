@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารสินทรัพย์พืชมีชีวิตระดับองค์กร (LPAMS) | Udon Thani Expo 2026</title>
+  <meta name="description" content="Enterprise Living Plant Asset & Nursery Stock Management System - งานมหกรรมพืชสวนโลก จ.อุดรธานี พ.ศ. 2569">
+  <meta name="theme-color" content="#E6007E">
+
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <!-- QRCode.js Library for high-res asset tag generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- LPAMS Core Data Bridge Layer -->
+  <script src="api_bridge.js"></script>
+
+  <style>
+    :root {
+      --primary: #E6007E;
+      --primary-dark: #b80065;
+      --primary-light: #ff3399;
+      --primary-soft: #fde6f2;
+      
+      --secondary: #00A950;
+      --secondary-dark: #00853f;
+      --secondary-light: #33be73;
+      --secondary-soft: #e6f7ee;
+      
+      --navy-dark: #0f172a;
+      --navy-sidebar: #1e293b;
+      --navy-hover: #334155;
+      
+      --bg-canvas: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-surface: #f1f5f9;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-card: 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-modal: 0 20px 45px rgba(0,0,0,0.25);
+      
+      --font-heading: 'Plus Jakarta Sans', 'Prompt', sans-serif;
+      --font-body: 'Prompt', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Navigation */
+    .admin-sidebar {
+      width: 260px;
+      background: var(--navy-sidebar);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 50;
+    }
+
+    .admin-brand {
+      padding: 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(230, 0, 126, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.3px;
+    }
+    .brand-text p {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+
+    .sidebar-menu {
+      padding: 16px 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-header {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 10px 12px 4px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .menu-item:hover {
+      background: var(--navy-hover);
+      color: #ffffff;
+    }
+
+    .menu-item.active {
+      background: linear-gradient(90deg, rgba(230,0,126,0.18) 0%, rgba(230,0,126,0.06) 100%);
+      border-color: rgba(230, 0, 126, 0.4);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .menu-item.active .menu-icon {
+      color: var(--primary);
+    }
+
+    .menu-icon {
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-launch-visitor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(230, 0, 126, 0.35);
+      transition: transform 0.2s;
+    }
+    .btn-launch-visitor:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Main Content Canvas */
+    .admin-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .admin-topbar {
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .admin-content {
+      padding: 24px;
+      flex: 1;
+    }
+
+    /* Section Views */
+    .admin-view {
+      display: none;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    .admin-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Grids */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--kpi-color, var(--primary));
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+    .kpi-sub {
+      font-size: 10.5px;
+      color: var(--text-subtle);
+      margin-top: 4px;
+    }
+    .kpi-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--kpi-bg, var(--primary-soft));
+      color: var(--kpi-color, var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    /* Tables */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12.5px;
+    }
+
+    table.data-table th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    table.data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    table.data-table tr:hover {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-published { background: #dcfce7; color: #15803d; }
+    .badge-verified { background: #e0f2fe; color: #0369a1; }
+    .badge-draft { background: #fef3c7; color: #b45309; }
+
+    .badge-good { background: #dcfce7; color: #15803d; }
+    .badge-watch { background: #fef3c7; color: #b45309; }
+    .badge-critical { background: #fee2e2; color: #b91c1c; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(230, 0, 126, 0.25);
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--secondary);
+      color: #ffffff;
+    }
+    .btn-secondary:hover {
+      background: var(--secondary-dark);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-dark);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: var(--bg-surface);
+    }
+
+    /* Search & Filter Toolbar */
+    .filter-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 6px 12px;
+      gap: 8px;
+      width: 280px;
+    }
+    .search-input-wrap input {
+      border: none;
+      outline: none;
+      font-size: 12.5px;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    /* Modal Sheet */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-container {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-modal);
+      animation: modalSlide 0.25s ease-out forwards;
+    }
+    @keyframes modalSlide {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--bg-surface);
+    }
+
+    /* Form Controls */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .form-input, .form-select, .form-textarea {
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--primary);
+    }
+
+    /* Printable QR Asset Label */
+    .qr-print-card {
+      width: 280px;
+      background: #ffffff;
+      border: 2px solid #0f172a;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      position: relative;
+    }
+    .qr-print-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+    .qr-print-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .qr-canvas-holder {
+      margin: 8px auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Print media styling */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-sheet-container, #print-sheet-container * {
+        visibility: visible;
+      }
+      #print-sheet-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+  
+    /* ===================================================
+       RESPONSIVE & MOBILE ADAPTIVE UX/UI (TEAM SKILL)
+       =================================================== */
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 998;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .btn-hamburger {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 16px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-hamburger:hover {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    /* Mobile Bottom Quick Navigation Bar */
+    .admin-mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      z-index: 900;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 4px;
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--text-muted);
+      font-size: 9.5px;
+      font-weight: 600;
+      text-decoration: none;
+      flex: 1;
+      padding: 6px 0;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .mobile-nav-item i {
+      font-size: 17px;
+    }
+    .mobile-nav-item.active {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 992px) {
+      .btn-hamburger {
+        display: flex;
+      }
+      .admin-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        transform: translateX(-100%);
+        box-shadow: none;
+      }
+      .admin-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);
+      }
+      .admin-topbar {
+        padding: 0 14px;
+        height: 58px;
+      }
+      .topbar-title {
+        font-size: 13.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 210px;
+      }
+      .user-pill {
+        padding: 4px 8px;
+        gap: 6px;
+      }
+      .user-pill div {
+        display: none;
+      }
+      .admin-content {
+        padding: 14px 12px 80px; /* space for mobile bottom nav */
+      }
+      .admin-mobile-nav {
+        display: flex;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .kpi-card {
+        padding: 12px 10px;
+      }
+      .kpi-value {
+        font-size: 19px;
+      }
+      .kpi-icon-wrap {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+      .filter-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-input-wrap {
+        width: 100%;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+      /* Dashboard two-column stacks to one-column on mobile */
+      #view-dashboard > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .topbar-title {
+        max-width: 145px;
+        font-size: 12.5px;
+      }
+    }
+
+</style>
+</head>
+<body>
+
+  <!-- Backdrop Overlay for Mobile Sidebar -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+
+  <!-- ===================================================
+       1. SIDEBAR NAVIGATION
+       =================================================== -->
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="brand-logo-badge">🌱</div>
+      <div class="brand-text">
+        <h1>LPAMS · EXPO 2026</h1>
+        <p>ระบบบริหารสินทรัพย์พืชมีชีวิต</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-header">ศูนย์บริหาร & ภาพรวม</div>
+      <a class="menu-item active" onclick="switchAdminTab('dashboard')">
+        <span class="menu-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span>แดชบอร์ดผู้บริหาร</span>
+      </a>
+      <a class="menu-item" onclick="switchAdminTab('inventory')">
+        <span class="menu-icon"><i class="fa-solid fa-tree"></i></span>
+        <span>ทะเบียนต้นไม้ (Tree ID)</span>
+      </a>
+
+      <div class="menu-header">ปฏิบัติงานภาคสนาม</div>
+      <a class="menu-item" onclick="switchAdminTab('observations')">
+        <span class="menu-icon"><i class="fa-solid fa-notes-medical"></i></span>
+        <span>สำรวจสุขภาพ & โต</span>
+      </a>
+      <a class="menu-item" onclick="switchAdminTab('maintenance')">
+        <span class="menu-icon"><i class="fa-solid fa-hand-holding-droplet"></i></span>
+        <span>ประวัติการดูแลพืช</span>
+      </a>
+      <a class="menu-item" onclick="switchAdminTab('zones')">
+        <span class="menu-icon"><i class="fa-solid fa-map-location-dot"></i></span>
+        <span>ผัง 7 โซนจัดแสดง</span>
+      </a>
+
+      <div class="menu-header">พาณิชย์ & ช่องทางจำหน่าย</div>
+      <a class="menu-item" onclick="switchAdminTab('stock')">
+        <span class="menu-icon"><i class="fa-solid fa-store"></i></span>
+        <span>สต็อกเรือนเพาะชำ</span>
+      </a>
+      <a class="menu-item" onclick="switchAdminTab('leads')">
+        <span class="menu-icon"><i class="fa-solid fa-users-viewfinder"></i></span>
+        <span>ผู้สนใจซื้อ (CRM Leads)</span>
+      </a>
+
+      <div class="menu-header">เครื่องมือ & ส่งออกข้อมูล</div>
+      <a class="menu-item" onclick="switchAdminTab('qrtags')">
+        <span class="menu-icon"><i class="fa-solid fa-qrcode"></i></span>
+        <span>พิมพ์ป้าย QR Code จริง</span>
+      </a>
+      <a class="menu-item" onclick="switchAdminTab('export')">
+        <span class="menu-icon"><i class="fa-solid fa-database"></i></span>
+        <span>สำรองข้อมูล & API</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="index.html" target="_blank" class="btn-launch-visitor">
+        <i class="fa-solid fa-mobile-screen"></i>
+        <span>เปิดแอปผู้เข้าชมงาน</span>
+      </a>
+      <p style="font-size: 9.5px; color: #64748b; text-align: center;">Udon Thani Expo 2026 LPAMS v2.0</p>
+    </div>
+  </aside>
+
+  <!-- ===================================================
+       2. MAIN CONTENT AREA
+       =================================================== -->
+  <main class="admin-main">
+    
+    <!-- Topbar Header -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebar()" title="เปิด/ปิดเมนู">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h2 class="topbar-title" id="adminHeaderTitle">📊 แดชบอร์ดผู้บริหาร (Executive Overview)</h2>
+      </div>
+      <div class="topbar-right">
+        <div class="user-pill">
+          <div class="user-avatar" id="adminUserAvatar">👑</div>
+          <div>
+            <p style="font-size: 11px; font-weight: 700;" id="adminUserName">ดร.นิธิศ (ผู้ดูแลระบบกลาง)</p>
+            <p style="font-size: 9.5px; color: var(--text-muted);">Executive Administrator</p>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="LPAMS_API.resetToDefaultDemo(); location.reload();" title="รีเซ็ตข้อมูลตัวอย่าง">
+          <i class="fa-solid fa-rotate"></i> รีเซ็ตข้อมูล
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- ===============================================
+           VIEW 1: EXECUTIVE DASHBOARD
+           =============================================== -->
+      <section id="view-dashboard" class="admin-view active">
+        <!-- Live KPI Metric Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" style="--kpi-color: #10b981; --kpi-bg: #dcfce7;">
+            <div>
+              <p class="kpi-label">ต้นไม้ในทะเบียนทั้งหมด</p>
+              <p class="kpi-value" id="kpiTotalTrees">0</p>
+              <p class="kpi-sub" id="kpiPublishedTrees">เผยแพร่สู่สาธารณะ 0 ต้น</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-tree"></i></div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-color: #0284c7; --kpi-bg: #e0f2fe;">
+            <div>
+              <p class="kpi-label">ดัชนีสุขภาพสมบูรณ์</p>
+              <p class="kpi-value" id="kpiHealthIndex">0%</p>
+              <p class="kpi-sub">ผ่านเกณฑ์มาตรฐานพืชสวน</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-heart-pulse"></i></div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-color: #8b5cf6; --kpi-bg: #ede9fe;">
+            <div>
+              <p class="kpi-label">ประมาณการดูดซับคาร์บอน</p>
+              <p class="kpi-value" id="kpiCarbonTons">0</p>
+              <p class="kpi-sub">ตัน CO₂ / ปี (Allometric Model)</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-leaf"></i></div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-color: #E6007E; --kpi-bg: #fde6f2;">
+            <div>
+              <p class="kpi-label">ยอดผู้สนใจ & การขาย</p>
+              <p class="kpi-value" id="kpiRevenue">฿0</p>
+              <p class="kpi-sub" id="kpiActiveLeads">0 Leads กำลังติดตาม</p>
+            </div>
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-sack-dollar"></i></div>
+          </div>
+        </div>
+
+        <!-- 7 Zones Completeness Progress Bars -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 15px; font-weight: 800;">ความคืบหน้าการสำรวจ 7 โซนจัดแสดงหลัก (Masterplan Zone Survey)</h3>
+              <p style="font-size: 11px; color: var(--text-muted);">เป้าหมายรวม 355 ต้นในพื้นที่นำร่องพืชสวนโลกหนองแด 164.8 เฮกตาร์</p>
+            </div>
+            <span class="badge badge-published" id="kpiOverallCompleteness">ความครบถ้วน 0%</span>
+          </div>
+
+          <div id="dashboardZonesProgress" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+
+        <!-- Two Column Overview: Urgent Watchlist & Recent Leads -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="card" style="margin-bottom: 0;">
+            <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #b45309;">
+              <i class="fa-solid fa-triangle-exclamation"></i> ต้นไม้ที่ต้องเฝ้าระวังพิเศษ (Health Watchlist)
+            </h3>
+            <div class="table-responsive">
+              <table class="data-table" id="dashboardWatchlistTable">
+                <thead>
+                  <tr>
+                    <th>Tree ID</th>
+                    <th>ชนิดพืช</th>
+                    <th>โซน</th>
+                    <th>สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: 0;">
+            <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 12px; color: var(--primary);">
+              <i class="fa-solid fa-users-viewfinder"></i> ผู้สนใจซื้อล่าสุดจากแอป (Recent Visitor Leads)
+            </h3>
+            <div class="table-responsive">
+              <table class="data-table" id="dashboardRecentLeadsTable">
+                <thead>
+                  <tr>
+                    <th>ผู้สนใจ</th>
+                    <th>ต้นไม้ / Tree ID</th>
+                    <th>ยอดสั่งซื้อ</th>
+                    <th>สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 2: TREE ASSET REGISTRY
+           =============================================== -->
+      <section id="view-inventory" class="admin-view">
+        <div class="filter-toolbar">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="search-input-wrap">
+              <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+              <input type="text" id="filterPlantSearch" placeholder="ค้นหา Tree ID, ชื่อพืช, โซน..." oninput="renderInventoryTable()">
+            </div>
+            <select class="form-select" id="filterPlantZone" onchange="renderInventoryTable()" style="padding: 7px 10px;">
+              <option value="">ทุกโซนจัดแสดง</option>
+            </select>
+            <select class="form-select" id="filterPlantStatus" onchange="renderInventoryTable()" style="padding: 7px 10px;">
+              <option value="">ทุกสถานะข้อมูล</option>
+              <option value="published">Published (เผยแพร่)</option>
+              <option value="verified">Verified (ตรวจสอบแล้ว)</option>
+              <option value="draft">Draft (ร่าง)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" onclick="LPAMS_API.exportPlantsCSV(); showToast('📥 ส่งออกไฟล์ CSV เรียบร้อย');">
+              <i class="fa-solid fa-file-csv"></i> ส่งออก CSV
+            </button>
+            <button class="btn btn-primary" onclick="openPlantModal()">
+              <i class="fa-solid fa-plus"></i> ขึ้นทะเบียนต้นไม้ใหม่
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="inventoryTable">
+              <thead>
+                <tr>
+                  <th>Tree ID / รหัสพืช</th>
+                  <th>ภาพ</th>
+                  <th>ชนิดพืช</th>
+                  <th>โซนจัดแสดง</th>
+                  <th>พิกัด GPS</th>
+                  <th>ความสูง / ทรงพุ่ม</th>
+                  <th>สุขภาพ</th>
+                  <th>สถานะข้อมูล</th>
+                  <th>สแกน</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 3: FIELD OBSERVATIONS & HEALTH
+           =============================================== -->
+      <section id="view-observations" class="admin-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 800;">ประวัติการตรวจสุขภาพและการเจริญเติบโต</h3>
+            <p style="font-size: 11.5px; color: var(--text-muted);">บันทึกความสูง ทรงพุ่ม เส้นรอบวง DBH และโรคแมลงภาคสนาม</p>
+          </div>
+          <button class="btn btn-primary" onclick="openObservationModal()">
+            <i class="fa-solid fa-plus"></i> เพิ่มบันทึกการสำรวจใหม่
+          </button>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="observationsTable">
+              <thead>
+                <tr>
+                  <th>วันที่สำรวจ</th>
+                  <th>Tree ID</th>
+                  <th>ชนิดพืช</th>
+                  <th>ความสูง (ม.)</th>
+                  <th>ทรงพุ่ม (ม.)</th>
+                  <th>DBH (ซม.)</th>
+                  <th>สถานะสุขภาพ</th>
+                  <th>บันทึกอาการ</th>
+                  <th>ผู้บันทึก</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 4: MAINTENANCE LOGS
+           =============================================== -->
+      <section id="view-maintenance" class="admin-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 800;">บันทึกประวัติการดูแลรักษา (Maintenance Log)</h3>
+            <p style="font-size: 11.5px; color: var(--text-muted);">รดน้ำ ใส่ปุ๋ย ตัดแต่งกิ่ง กำจัดศัตรูพืช ค้ำยัน และการย้ายแปลง</p>
+          </div>
+          <button class="btn btn-primary" onclick="openMaintenanceModal()">
+            <i class="fa-solid fa-plus"></i> บันทึกการดูแลใหม่
+          </button>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="maintenanceTable">
+              <thead>
+                <tr>
+                  <th>วันที่ปฏิบัติงาน</th>
+                  <th>Tree ID</th>
+                  <th>ชนิดพืช</th>
+                  <th>กิจกรรม</th>
+                  <th>รายละเอียดการดูแล</th>
+                  <th>ผู้ปฏิบัติงาน</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 5: 7 MASTERPLAN ZONES
+           =============================================== -->
+      <section id="view-zones" class="admin-view">
+        <div style="margin-bottom: 20px;">
+          <h3 style="font-size: 16px; font-weight: 800;">ผังแม่บท 7 โซนจัดแสดง (Masterplan Zones & Asset Spatial)</h3>
+          <p style="font-size: 11.5px; color: var(--text-muted);">ข้อมูลการกระจายตัวของสินทรัพย์พืชมีชีวิต และผู้รับผิดชอบประจำโซน</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;" id="zonesCardsGrid"></div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 6: NURSERY STOCK & COMMERCIAL
+           =============================================== -->
+      <section id="view-stock" class="admin-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 800;">ระบบสต็อกเรือนเพาะชำ & การเชื่อมโยงการขาย (Nursery Stock Link)</h3>
+            <p style="font-size: 11.5px; color: var(--text-muted);">ผูกต้นไม้จัดแสดงในงานกับสต็อกพันธุ์ไม้พร้อมจำหน่าย</p>
+          </div>
+          <button class="btn btn-secondary" onclick="showToast('✅ อัปเดตการตรวจนับสต็อกรายสัปดาห์เรียบร้อย')">
+            <i class="fa-solid fa-clipboard-check"></i> ตรวจนับสต็อกวันนี้
+          </button>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="stockTable">
+              <thead>
+                <tr>
+                  <th>ชนิดพันธุ์ไม้</th>
+                  <th>เรือนเพาะชำ</th>
+                  <th>ขนาดกระถาง/ต้น</th>
+                  <th>สต็อกคงเหลือ</th>
+                  <th>ราคาจำหน่าย</th>
+                  <th>สถานะการขาย</th>
+                  <th>ตรวจนับล่าสุด</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 7: VISITOR INTEREST LEADS (CRM)
+           =============================================== -->
+      <section id="view-leads" class="admin-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 800;">ไปป์ไลน์ผู้สนใจและคำสั่งซื้อ (Visitor Leads & CRM)</h3>
+            <p style="font-size: 11.5px; color: var(--text-muted);">บันทึกข้อมูลผู้เข้าชมที่สแกน ขอราคา หรือสั่งซื้อผ่านแอป</p>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="data-table" id="leadsTable">
+              <thead>
+                <tr>
+                  <th>วันที่/เวลา</th>
+                  <th>ชื่อผู้ติดต่อ</th>
+                  <th>เบอร์โทร</th>
+                  <th>Tree ID / ต้นไม้</th>
+                  <th>ประเภทกิจกรรม</th>
+                  <th>มูลค่า</th>
+                  <th>สถานะไปป์ไลน์</th>
+                  <th>บันทึกทีมงาน</th>
+                  <th>อัปเดต</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 8: QR TAG BATCH GENERATOR & PRINT
+           =============================================== -->
+      <section id="view-qrtags" class="admin-view">
+        <div class="filter-toolbar">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 800;">ระบบสร้างป้าย QR Code ประจำต้นไม้จริง (Asset Label Generator)</h3>
+            <p style="font-size: 11.5px; color: var(--text-muted);">พิมพ์ป้ายพร้อมติดตั้งภาคสนาม มี Tree ID และ URL เปิดตรงเข้าแอป</p>
+          </div>
+          <button class="btn btn-primary" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> พิมพ์ป้ายทั้งหมด (Print Sheet)
+          </button>
+        </div>
+
+        <div id="print-sheet-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;"></div>
+      </section>
+
+      <!-- ===============================================
+           VIEW 9: DATA EXPORT & REST API INTEGRATION
+           =============================================== -->
+      <section id="view-export" class="admin-view">
+        <div class="card">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 8px;">
+            <i class="fa-solid fa-file-export" style="color: var(--primary);"></i> สำรองข้อมูล & ป้องกันการผูกติด (Data Portability)
+          </h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+            ส่งออกฐานข้อมูลทั้งหมดเป็น JSON หรือ CSV ตามข้อกำหนดใน TOR เพื่อให้หน่วยงานเป็นผู้ถือครองข้อมูล 100%
+          </p>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="downloadJSONBackup()">
+              <i class="fa-solid fa-download"></i> ดาวน์โหลด JSON Backup เต็มรูปแบบ
+            </button>
+            <button class="btn btn-outline" onclick="LPAMS_API.exportPlantsCSV(); showToast('📥 ส่งออก CSV ทะเบียนพืชเรียบร้อย');">
+              <i class="fa-solid fa-file-csv"></i> ส่งออก Plants Registry (CSV)
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 10px;">
+            <i class="fa-solid fa-network-wired" style="color: var(--secondary);"></i> REST API Endpoints สำหรับเชื่อมต่อแอปพลิเคชัน
+          </h3>
+          <div style="background: #0f172a; color: #38bdf8; padding: 14px; border-radius: var(--radius-md); font-family: monospace; font-size: 12px; line-height: 1.8;">
+            <p><span style="color: #4ade80;">GET</span>  /api/v1/plants         ➔ รายการต้นไม้ที่เผยแพร่ (Tree ID, พิกัด, ข้อมูลพฤกษศาสตร์)</p>
+            <p><span style="color: #4ade80;">GET</span>  /api/v1/plants/:tree_id ➔ ข้อมูลต้นไม้รายต้นตามรหัสสแกน QR Code</p>
+            <p><span style="color: #facc15;">POST</span> /api/v1/observations   ➔ บันทึกผลการสำรวจสุขภาพและขนาดภาคสนาม</p>
+            <p><span style="color: #facc15;">POST</span> /api/v1/leads          ➔ บันทึกความสนใจและการสั่งซื้อจากแอปผู้เข้าชม</p>
+            <p><span style="color: #4ade80;">GET</span>  /api/v1/zones          ➔ ผังขอบเขต 7 โซน GeoJSON และเป้าหมายสำรวจ</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ===================================================
+       MODAL 1: ADD / EDIT PLANT ASSET
+       =================================================== -->
+  <div class="modal-backdrop" id="modalPlant">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalPlantTitle">ขึ้นทะเบียนต้นไม้ใหม่ (New Plant Asset)</h3>
+        <button class="btn btn-outline btn-sm" onclick="closePlantModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleSavePlant(event)">
+        <div class="modal-body">
+          <input type="hidden" id="formPlantId">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Tree ID (รหัสประจำต้นถาวร)</label>
+              <input type="text" class="form-input" id="formTreeId" placeholder="เช่น UD-ORC-009 (ปล่อยว่างเพื่อสร้างอัตโนมัติ)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ชนิดพันธุ์ไม้ (Species Master)</label>
+              <select class="form-select" id="formSpeciesId" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">โซนจัดแสดง</label>
+              <select class="form-select" id="formZoneId" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">สถานะสุขภาพ</label>
+              <select class="form-select" id="formHealthStatus">
+                <option value="good">สมบูรณ์ดี (Good)</option>
+                <option value="watch">เฝ้าระวังพิเศษ (Watch)</option>
+                <option value="critical">วิกฤต/ติดโรค (Critical)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">พิกัดละติจูด (Lat)</label>
+              <input type="number" step="0.000001" class="form-input" id="formLat" value="13.7225" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">พิกัดลองจิจูด (Lng)</label>
+              <input type="number" step="0.000001" class="form-input" id="formLng" value="100.4420" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ความสูงเริ่มต้น (เมตร)</label>
+              <input type="number" step="0.01" class="form-input" id="formHeight" value="1.0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ขนาดทรงพุ่ม (เมตร)</label>
+              <input type="number" step="0.01" class="form-input" id="formCanopy" value="0.8" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ราคาจำหน่ายโดยประมาณ (บาท)</label>
+              <input type="number" class="form-input" id="formPrice" value="350">
+            </div>
+            <div class="form-group">
+              <label class="form-label">สต็อกเรือนเพาะชำ (ต้น)</label>
+              <input type="number" class="form-input" id="formStockQty" value="20">
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">จุดสังเกตตำแหน่ง (Landmark Note)</label>
+              <input type="text" class="form-input" id="formLandmark" placeholder="เช่น ริมสะพานไม้ เสาต้นที่ 4">
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">URL รูปภาพต้นไม้</label>
+              <input type="text" class="form-input" id="formImage" value="https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=600&auto=format&fit=crop&q=80">
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">สถานะการตรวจสอบข้อมูล (Data Governance)</label>
+              <select class="form-select" id="formDataStatus">
+                <option value="published">Published (เผยแพร่สู่แอปผู้เข้าชมทันที)</option>
+                <option value="verified">Verified (ตรวจสอบแล้ว รอเผยแพร่)</option>
+                <option value="draft">Draft (ฉบับร่างภาคสนาม)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closePlantModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> บันทึกข้อมูลสินทรัพย์</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       MODAL 2: ADD OBSERVATION
+       =================================================== -->
+  <div class="modal-backdrop" id="modalObservation">
+    <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">บันทึกผลการสำรวจสุขภาพ (New Observation)</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeObservationModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleSaveObservation(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label">เลือกต้นไม้ที่สำรวจ</label>
+            <select class="form-select" id="obsPlantSelect" required></select>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">ความสูงปัจจุบัน (เมตร)</label>
+              <input type="number" step="0.01" class="form-input" id="obsHeight" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ขนาดทรงพุ่ม (เมตร)</label>
+              <input type="number" step="0.01" class="form-input" id="obsCanopy" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">เส้นรอบวง DBH (ซม.)</label>
+              <input type="number" step="0.1" class="form-input" id="obsDbh" value="3.0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">การประเมินสุขภาพ</label>
+              <select class="form-select" id="obsHealth">
+                <option value="good">สมบูรณ์ดี (Good)</option>
+                <option value="watch">เฝ้าระวังพิเศษ (Watch)</option>
+                <option value="critical">วิกฤต/ติดโรค (Critical)</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">บันทึกอาการและข้อสังเกต</label>
+              <textarea class="form-textarea" id="obsNote" rows="3" placeholder="ระบุการแตกใบ ดอก หรือร่องรอยศัตรูพืช..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeObservationModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> บันทึกผลสำรวจ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       MODAL 3: ADD MAINTENANCE
+       =================================================== -->
+  <div class="modal-backdrop" id="modalMaintenance">
+    <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">บันทึกการดูแลรักษา (Maintenance Log)</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeMaintenanceModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleSaveMaintenance(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label">เลือกต้นไม้</label>
+            <select class="form-select" id="maintPlantSelect" required></select>
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label">กิจกรรมการดูแล</label>
+            <select class="form-select" id="maintActivity">
+              <option value="water">💧 รดน้ำ / ปรับระดับน้ำ</option>
+              <option value="fertilize">🧪 ใส่ปุ๋ย / ฮอร์โมนบำรุง</option>
+              <option value="prune">✂️ ตัดแต่งกิ่ง / เล็มใบแห้ง</option>
+              <option value="pest_control">🛡️ กำจัดศัตรูพืช / ชีวภัณฑ์</option>
+              <option value="support">🪵 ติดตั้งหลักค้ำยัน</option>
+              <option value="transplant">🚚 ล้อมย้ายแปลงจัดแสดง</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">รายละเอียดการดูแล / สารที่ใช้</label>
+            <textarea class="form-textarea" id="maintNote" rows="3" placeholder="ระบุสูตรปุ๋ย หรือปริมาณสารที่ใช้..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeMaintenanceModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> บันทึกการดูแล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" style="position:fixed; bottom:24px; right:24px; background:#0f172a; color:#fff; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; box-shadow:0 8px 24px rgba(0,0,0,0.2); z-index:200; display:none;">
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- JavaScript Admin Controller -->
+  <script>
+    let currentAdminTab = 'dashboard';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+      populateDropdowns();
+      
+      // Listen to cross-tab updates from Visitor App or LocalStorage
+      window.addEventListener('lpams_data_updated', () => {
+        refreshCurrentTab();
+      });
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+        function toggleSidebar(forceState) {
+      const sidebar = document.querySelector('.admin-sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const isOpen = sidebar.classList.contains('open');
+      const targetState = forceState !== undefined ? forceState : !isOpen;
+
+      if (targetState) {
+        sidebar.classList.add('open');
+        backdrop.classList.add('active');
+      } else {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('active');
+      }
+    }
+
+    function switchAdminTab(tabId) {
+      currentAdminTab = tabId;
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
+      document.querySelectorAll('.admin-view').forEach(view => view.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+
+      const targetView = document.getElementById('view-' + tabId);
+      if (targetView) targetView.classList.add('active');
+
+      const mobNavItem = document.getElementById('mobNav-' + tabId);
+      if (mobNavItem) mobNavItem.classList.add('active');
+
+      // Find and active desktop menu item
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) {
+          item.classList.add('active');
+        }
+      });
+
+      // Auto close mobile drawer if open
+      if (window.innerWidth <= 992) {
+        toggleSidebar(false);
+      }
+
+      const titles = {
+        'dashboard': '📊 แดชบอร์ดผู้บริหาร (Executive Overview)',
+        'inventory': '🌳 ทะเบียนต้นไม้รายต้น (Living Plant Asset Registry)',
+        'observations': '🩺 การตรวจสุขภาพและการเจริญเติบโต (Observations)',
+        'maintenance': '💧 ประวัติการดูแลรักษา (Maintenance Logs)',
+        'zones': '🗺️ ผังแม่บท 7 โซนจัดแสดง (Masterplan Zones)',
+        'stock': '🏪 สต็อกเรือนเพาะชำ & การเชื่อมโยงการขาย (Nursery Stock)',
+        'leads': '👥 ไปป์ไลน์ผู้สนใจและคำสั่งซื้อ (Visitor Leads & CRM)',
+        'qrtags': '🏷️ ระบบสร้างป้าย QR Code ประจำต้นไม้จริง (Asset Labels)',
+        'export': '💾 สำรองข้อมูล & เชื่อมต่อ REST API (Data Portability)'
+      };
+      document.getElementById('adminHeaderTitle').textContent = titles[tabId] || 'LPAMS Admin';
+
+      refreshCurrentTab();
+    }
+
+    function refreshCurrentTab() {
+      if (currentAdminTab === 'dashboard') renderDashboard();
+      else if (currentAdminTab === 'inventory') renderInventoryTable();
+      else if (currentAdminTab === 'observations') renderObservationsTable();
+      else if (currentAdminTab === 'maintenance') renderMaintenanceTable();
+      else if (currentAdminTab === 'zones') renderZonesGrid();
+      else if (currentAdminTab === 'stock') renderStockTable();
+      else if (currentAdminTab === 'leads') renderLeadsTable();
+      else if (currentAdminTab === 'qrtags') renderQrTagsPrintSheet();
+    }
+
+    function populateDropdowns() {
+      const species = LPAMS_API.getAllSpecies();
+      const zones = LPAMS_API.getAllZones();
+      const plants = LPAMS_API.getAllPlants();
+
+      // Filter Zone
+      const filterZone = document.getElementById('filterPlantZone');
+      if (filterZone) {
+        filterZone.innerHTML = '<option value="">ทุกโซนจัดแสดง</option>' + zones.map(z => `<option value="${z.id}">${z.zoneCode} - ${z.nameTh}</option>`).join('');
+      }
+
+      // Modal Species
+      const formSpec = document.getElementById('formSpeciesId');
+      if (formSpec) {
+        formSpec.innerHTML = species.map(s => `<option value="${s.id}">${s.nameTh} (${s.nameScientific})</option>`).join('');
+      }
+
+      // Modal Zone
+      const formZone = document.getElementById('formZoneId');
+      if (formZone) {
+        formZone.innerHTML = zones.map(z => `<option value="${z.id}">${z.zoneCode} - ${z.nameTh}</option>`).join('');
+      }
+
+      // Observation / Maintenance Plant Select
+      const obsSelect = document.getElementById('obsPlantSelect');
+      const maintSelect = document.getElementById('maintPlantSelect');
+      const options = plants.map(p => {
+        const spec = LPAMS_API.getSpeciesById(p.speciesId);
+        return `<option value="${p.id}">${p.treeId} - ${spec ? spec.nameTh : ''} (${p.zoneCode})</option>`;
+      }).join('');
+      if (obsSelect) obsSelect.innerHTML = options;
+      if (maintSelect) maintSelect.innerHTML = options;
+    }
+
+    // 1. Render Dashboard
+    function renderDashboard() {
+      const kpis = LPAMS_API.getDashboardKPIs();
+      document.getElementById('kpiTotalTrees').textContent = kpis.totalLivingTrees;
+      document.getElementById('kpiPublishedTrees').textContent = `เผยแพร่สู่สาธารณะ ${kpis.totalPublished} ต้น`;
+      document.getElementById('kpiHealthIndex').textContent = `${kpis.healthIndexPct}%`;
+      document.getElementById('kpiCarbonTons').textContent = kpis.totalCarbonTons;
+      document.getElementById('kpiRevenue').textContent = `฿${kpis.totalRevenue.toLocaleString()}`;
+      document.getElementById('kpiActiveLeads').textContent = `${kpis.activeLeadsCount} Leads กำลังติดตาม`;
+      document.getElementById('kpiOverallCompleteness').textContent = `ความครบถ้วน ${kpis.completenessPct}%`;
+
+      // Zones Progress
+      const zonesContainer = document.getElementById('dashboardZonesProgress');
+      zonesContainer.innerHTML = kpis.zonesSummary.map(z => `
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span style="font-weight:700;"><span style="color:${z.color};">●</span> ${z.code}: ${z.nameTh}</span>
+            <span style="color:var(--text-muted);">${z.current} / ${z.target} ต้น (${z.pct}%)</span>
+          </div>
+          <div style="width:100%; height:7px; background:#e2e8f0; border-radius:99px; overflow:hidden;">
+            <div style="width:${z.pct}%; height:100%; background:${z.color}; border-radius:99px;"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Watchlist
+      const watchlist = LPAMS_API.getAllPlants({ healthStatus: 'watch' }).concat(LPAMS_API.getAllPlants({ healthStatus: 'critical' }));
+      const watchTbody = document.querySelector('#dashboardWatchlistTable tbody');
+      if (watchlist.length === 0) {
+        watchTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">ไม่มีต้นไม้ที่อยู่ในเกณฑ์เฝ้าระวัง</td></tr>';
+      } else {
+        watchTbody.innerHTML = watchlist.map(p => {
+          const spec = LPAMS_API.getSpeciesById(p.speciesId);
+          return `
+            <tr>
+              <td><b>${p.treeId}</b></td>
+              <td>${spec ? spec.nameTh : ''}</td>
+              <td>${p.zoneCode}</td>
+              <td><span class="badge badge-${p.healthStatus}">${p.healthStatus === 'critical' ? 'วิกฤต' : 'เฝ้าระวัง'}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Recent Leads
+      const leads = LPAMS_API.getAllLeads().slice(0, 4);
+      const leadsTbody = document.querySelector('#dashboardRecentLeadsTable tbody');
+      leadsTbody.innerHTML = leads.map(l => `
+        <tr>
+          <td><b>${l.customerName}</b><br><span style="font-size:10px; color:var(--text-muted);">${l.phone}</span></td>
+          <td>${l.plantName}<br><span style="font-size:10px; color:var(--primary);">${l.treeId}</span></td>
+          <td><b>฿${(l.totalThb || 0).toLocaleString()}</b></td>
+          <td><span class="badge ${l.status === 'completed' ? 'badge-published' : 'badge-draft'}">${l.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // 2. Render Inventory Table
+    function renderInventoryTable() {
+      const q = document.getElementById('filterPlantSearch')?.value || '';
+      const zoneId = document.getElementById('filterPlantZone')?.value || '';
+      const status = document.getElementById('filterPlantStatus')?.value || '';
+
+      const plants = LPAMS_API.getAllPlants({ query: q, zoneId: zoneId, dataStatus: status });
+      const tbody = document.querySelector('#inventoryTable tbody');
+
+      tbody.innerHTML = plants.map(p => {
+        const spec = LPAMS_API.getSpeciesById(p.speciesId) || {};
+        return `
+          <tr>
+            <td>
+              <b style="color:var(--text-main); font-size:13px;">${p.treeId}</b><br>
+              <span style="font-size:10.5px; color:var(--text-muted); font-family:monospace;">${p.plantCode}</span>
+            </td>
+            <td>
+              <img src="${p.mainImage}" alt="${spec.nameTh}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
+            </td>
+            <td>
+              <b>${spec.nameTh || 'ไม่ระบุ'}</b><br>
+              <span style="font-size:11px; font-style:italic; color:var(--text-muted);">${spec.nameScientific || ''}</span>
+            </td>
+            <td><span class="badge" style="background:${LPAMS_API.getZoneById(p.zoneId)?.color}20; color:${LPAMS_API.getZoneById(p.zoneId)?.color}; font-weight:800;">${p.zoneCode}</span></td>
+            <td><span style="font-size:11px; font-family:monospace;">${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span></td>
+            <td>${p.heightM} ม. / ${p.canopyM} ม.</td>
+            <td><span class="badge badge-${p.healthStatus}">${p.healthStatus === 'good' ? 'สมบูรณ์' : p.healthStatus}</span></td>
+            <td><span class="badge badge-${p.dataStatus}">${p.dataStatus}</span></td>
+            <td><b style="color:var(--primary);">${p.scanCount || 0}</b></td>
+            <td>
+              <div style="display:flex; gap:4px;">
+                ${p.dataStatus !== 'published' ? `
+                  <button class="btn btn-outline btn-sm" style="color:#15803d; border-color:#86efac;" onclick="publishPlantQuick(${p.id})" title="อนุมัติเผยแพร่ทันที">
+                    <i class="fa-solid fa-check"></i>
+                  </button>
+                ` : ''}
+                <button class="btn btn-outline btn-sm" onclick="editPlant(${p.id})" title="แก้ไข">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn btn-outline btn-sm" style="color:#dc2626;" onclick="deletePlantQuick(${p.id})" title="ลบ">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function publishPlantQuick(id) {
+      LPAMS_API.verifyAndPublishPlant(id);
+      showToast("✅ อนุมัติเผยแพร่สู่แอปผู้เข้าชมงานเรียบร้อยแล้ว!");
+      renderInventoryTable();
+    }
+
+    function deletePlantQuick(id) {
+      if (confirm("ยืนยันการลบต้นไม้นี้ออกจากทะเบียนสินทรัพย์?")) {
+        LPAMS_API.deletePlant(id);
+        showToast("🗑️ ลบข้อมูลต้นไม้เรียบร้อย");
+        renderInventoryTable();
+      }
+    }
+
+    // Modal Plant Save
+    function openPlantModal(plant = null) {
+      populateDropdowns();
+      const modal = document.getElementById('modalPlant');
+      if (plant) {
+        document.getElementById('modalPlantTitle').textContent = `แก้ไขข้อมูลสินทรัพย์ (${plant.treeId})`;
+        document.getElementById('formPlantId').value = plant.id;
+        document.getElementById('formTreeId').value = plant.treeId;
+        document.getElementById('formSpeciesId').value = plant.speciesId;
+        document.getElementById('formZoneId').value = plant.zoneId;
+        document.getElementById('formHealthStatus').value = plant.healthStatus;
+        document.getElementById('formLat').value = plant.lat;
+        document.getElementById('formLng').value = plant.lng;
+        document.getElementById('formHeight').value = plant.heightM;
+        document.getElementById('formCanopy').value = plant.canopyM;
+        document.getElementById('formPrice').value = plant.price;
+        document.getElementById('formStockQty').value = plant.stockQty;
+        document.getElementById('formLandmark').value = plant.landmarkNote || '';
+        document.getElementById('formImage').value = plant.mainImage || '';
+        document.getElementById('formDataStatus').value = plant.dataStatus;
+      } else {
+        document.getElementById('modalPlantTitle').textContent = 'ขึ้นทะเบียนต้นไม้ใหม่ (New Plant Asset)';
+        document.getElementById('formPlantId').value = '';
+        document.getElementById('formTreeId').value = '';
+        document.getElementById('formLandmark').value = '';
+      }
+      modal.classList.add('active');
+    }
+
+    function closePlantModal() {
+      document.getElementById('modalPlant').classList.remove('active');
+    }
+
+    function editPlant(id) {
+      const p = LPAMS_API.getPlantById(id);
+      if (p) openPlantModal(p);
+    }
+
+    function handleSavePlant(e) {
+      e.preventDefault();
+      const plantId = document.getElementById('formPlantId').value;
+      const data = {
+        speciesId: Number(document.getElementById('formSpeciesId').value),
+        zoneId: Number(document.getElementById('formZoneId').value),
+        healthStatus: document.getElementById('formHealthStatus').value,
+        lat: Number(document.getElementById('formLat').value),
+        lng: Number(document.getElementById('formLng').value),
+        heightM: Number(document.getElementById('formHeight').value),
+        canopyM: Number(document.getElementById('formCanopy').value),
+        price: Number(document.getElementById('formPrice').value),
+        stockQty: Number(document.getElementById('formStockQty').value),
+        landmarkNote: document.getElementById('formLandmark').value,
+        mainImage: document.getElementById('formImage').value,
+        dataStatus: document.getElementById('formDataStatus').value
+      };
+
+      const customTreeId = document.getElementById('formTreeId').value.trim();
+      if (customTreeId) data.treeId = customTreeId;
+      if (plantId) data.id = Number(plantId);
+
+      LPAMS_API.savePlant(data);
+      closePlantModal();
+      showToast("💾 บันทึกทะเบียนต้นไม้สำเร็จ และซิงค์ข้อมูลกับแอปเรียบร้อยแล้ว!");
+      renderInventoryTable();
+    }
+
+    // 3. Observations
+    function renderObservationsTable() {
+      const plants = LPAMS_API.getAllPlants();
+      let allObs = [];
+      plants.forEach(p => {
+        const obs = LPAMS_API.getObservationsByPlant(p.id);
+        allObs = allObs.concat(obs);
+      });
+
+      const tbody = document.querySelector('#observationsTable tbody');
+      tbody.innerHTML = allObs.map(o => {
+        const p = LPAMS_API.getPlantById(o.plantId);
+        const spec = p ? LPAMS_API.getSpeciesById(p.speciesId) : {};
+        return `
+          <tr>
+            <td>${o.observedAt}</td>
+            <td><b style="color:var(--primary);">${p ? p.treeId : o.plantCode}</b></td>
+            <td>${spec ? spec.nameTh : '-'}</td>
+            <td><b>${o.heightM}</b></td>
+            <td>${o.canopyM}</td>
+            <td>${o.dbhCm || '-'}</td>
+            <td><span class="badge badge-${o.healthStatus}">${o.healthStatus}</span></td>
+            <td>${o.healthNote || '-'}</td>
+            <td>${o.observer}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openObservationModal() {
+      populateDropdowns();
+      document.getElementById('modalObservation').classList.add('active');
+    }
+    function closeObservationModal() {
+      document.getElementById('modalObservation').classList.remove('active');
+    }
+    function handleSaveObservation(e) {
+      e.preventDefault();
+      const data = {
+        plantId: Number(document.getElementById('obsPlantSelect').value),
+        heightM: Number(document.getElementById('obsHeight').value),
+        canopyM: Number(document.getElementById('obsCanopy').value),
+        dbhCm: Number(document.getElementById('obsDbh').value),
+        healthStatus: document.getElementById('obsHealth').value,
+        healthNote: document.getElementById('obsNote').value
+      };
+      LPAMS_API.addObservation(data);
+      closeObservationModal();
+      showToast("🩺 บันทึกผลสำรวจสุขภาพต้นไม้สำเร็จ!");
+      renderObservationsTable();
+    }
+
+    // 4. Maintenance
+    function renderMaintenanceTable() {
+      const logs = LPAMS_API.getMaintenanceLogs();
+      const tbody = document.querySelector('#maintenanceTable tbody');
+      tbody.innerHTML = logs.map(m => {
+        const p = LPAMS_API.getPlantById(m.plantId);
+        const spec = p ? LPAMS_API.getSpeciesById(p.speciesId) : {};
+        return `
+          <tr>
+            <td>${m.performedAt}</td>
+            <td><b style="color:var(--primary);">${p ? p.treeId : m.plantCode}</b></td>
+            <td>${spec ? spec.nameTh : '-'}</td>
+            <td><span class="badge badge-published">${m.activity}</span></td>
+            <td>${m.note}</td>
+            <td>${m.performer}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openMaintenanceModal() {
+      populateDropdowns();
+      document.getElementById('modalMaintenance').classList.add('active');
+    }
+    function closeMaintenanceModal() {
+      document.getElementById('modalMaintenance').classList.remove('active');
+    }
+    function handleSaveMaintenance(e) {
+      e.preventDefault();
+      const data = {
+        plantId: Number(document.getElementById('maintPlantSelect').value),
+        activity: document.getElementById('maintActivity').value,
+        note: document.getElementById('maintNote').value
+      };
+      LPAMS_API.addMaintenanceLog(data);
+      closeMaintenanceModal();
+      showToast("💧 บันทึกกิจกรรมการดูแลรักษาเรียบร้อย!");
+      renderMaintenanceTable();
+    }
+
+    // 5. Zones Grid
+    function renderZonesGrid() {
+      const zones = LPAMS_API.getAllZones();
+      const container = document.getElementById('zonesCardsGrid');
+      container.innerHTML = zones.map(z => `
+        <div class="card" style="border-top: 4px solid ${z.color}; margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+            <div>
+              <span class="badge" style="background:${z.color}20; color:${z.color}; font-weight:800;">${z.zoneCode}</span>
+              <h4 style="font-size:15px; font-weight:800; margin-top:4px;">${z.nameTh}</h4>
+              <p style="font-size:11px; color:var(--text-muted);">${z.nameEn}</p>
+            </div>
+            <span style="font-size:24px;">${z.icon}</span>
+          </div>
+
+          <div style="margin:12px 0;">
+            <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
+              <span>สำรวจแล้ว <b>${z.currentCount || 0}</b> ต้น</span>
+              <span>เป้าหมาย <b>${z.targetCount || 50}</b> ต้น</span>
+            </div>
+            <div style="width:100%; height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden;">
+              <div style="width:${Math.min(100, Math.round(((z.currentCount || 0)/(z.targetCount || 50))*100))}%; height:100%; background:${z.color};"></div>
+            </div>
+          </div>
+
+          <p style="font-size:11.5px; color:var(--text-muted);">
+            <i class="fa-solid fa-user-tie" style="color:${z.color};"></i> ผู้ดูแล: ${z.leadArborist}
+          </p>
+        </div>
+      `).join('');
+    }
+
+    // 6. Nursery Stock
+    function renderStockTable() {
+      const plants = LPAMS_API.getAllPlants();
+      const tbody = document.querySelector('#stockTable tbody');
+      tbody.innerHTML = plants.map(p => {
+        const spec = LPAMS_API.getSpeciesById(p.speciesId) || {};
+        return `
+          <tr>
+            <td>
+              <b>${spec.nameTh || 'ไม่ระบุ'}</b><br>
+              <span style="font-size:10.5px; color:var(--text-muted);">${p.treeId}</span>
+            </td>
+            <td>เรือนเพาะชำประจำโซน ${p.zoneCode}</td>
+            <td>กระถาง 8-12 นิ้ว / ฟอร์มพร้อมส่ง</td>
+            <td><b style="color:${(p.stockQty || 0) < 10 ? '#dc2626' : '#15803d'}; font-size:13px;">${p.stockQty || 0} ต้น</b></td>
+            <td><b style="color:var(--primary);">฿${(p.price || 350).toLocaleString()}</b></td>
+            <td><span class="badge ${(p.stockQty || 0) > 0 ? 'badge-published' : 'badge-critical'}">${(p.stockQty || 0) > 0 ? 'พร้อมจำหน่าย' : 'หมดชั่วคราว'}</span></td>
+            <td>${p.updatedAt.split(' ')[0]}</td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="quickEditStock(${p.id}, ${p.stockQty || 0}, ${p.price || 350})">
+                ปรับสต็อก / ราคา
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function quickEditStock(plantId, currentStock, currentPrice) {
+      const newStock = prompt("ระบุจำนวนสต็อกคงเหลือใหม่ (ต้น):", currentStock);
+      if (newStock !== null) {
+        const newPrice = prompt("ระบุราคาจำหน่ายใหม่ (บาท):", currentPrice);
+        const p = LPAMS_API.getPlantById(plantId);
+        if (p) {
+          p.stockQty = Number(newStock);
+          if (newPrice !== null) p.price = Number(newPrice);
+          LPAMS_API.savePlant(p);
+          showToast("🏪 ปรับปรุงสต็อกและราคาเรียบร้อยแล้ว!");
+          renderStockTable();
+        }
+      }
+    }
+
+    // 7. Leads CRM
+    function renderLeadsTable() {
+      const leads = LPAMS_API.getAllLeads();
+      const tbody = document.querySelector('#leadsTable tbody');
+      tbody.innerHTML = leads.map(l => `
+        <tr>
+          <td>${l.timestamp}</td>
+          <td><b>${l.customerName}</b></td>
+          <td><a href="tel:${l.phone}" style="color:var(--primary); font-weight:700; text-decoration:none;">${l.phone}</a></td>
+          <td>${l.plantName} <span class="badge" style="background:#fde6f2; color:var(--primary);">${l.treeId}</span></td>
+          <td><span class="badge ${l.activityType === 'direct_order' ? 'badge-published' : 'badge-verified'}">${l.activityType}</span></td>
+          <td><b>฿${(l.totalThb || 0).toLocaleString()}</b></td>
+          <td>
+            <select class="form-select" style="padding:4px 8px; font-size:11px;" onchange="changeLeadStatus(${l.id}, this.value)">
+              <option value="new" ${l.status === 'new' ? 'selected' : ''}>รอติดต่อ (New)</option>
+              <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>ติดต่อแล้ว (Contacted)</option>
+              <option value="in_progress" ${l.status === 'in_progress' ? 'selected' : ''}>กำลังประสาน (In Progress)</option>
+              <option value="completed" ${l.status === 'completed' ? 'selected' : ''}>ปิดการขาย (Won)</option>
+              <option value="cancelled" ${l.status === 'cancelled' ? 'selected' : ''}>ยกเลิก (Lost)</option>
+            </select>
+          </td>
+          <td><span style="font-size:11px; color:var(--text-muted);">${l.note || '-'}</span></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="addLeadStaffNote(${l.id})"><i class="fa-solid fa-comment"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function changeLeadStatus(leadId, newStatus) {
+      LPAMS_API.updateLeadStatus(leadId, newStatus);
+      showToast(`📝 อัปเดตสถานะ Lead เป็น "${newStatus}" สำเร็จ`);
+    }
+
+    function addLeadStaffNote(leadId) {
+      const note = prompt("เพิ่มบันทึกการประสานงานลูกค้า:");
+      if (note) {
+        LPAMS_API.updateLeadStatus(leadId, undefined, note);
+        showToast("💾 เพิ่มบันทึกเรียบร้อย");
+        renderLeadsTable();
+      }
+    }
+
+    // 8. QR Asset Tags
+    function renderQrTagsPrintSheet() {
+      const plants = LPAMS_API.getAllPlants({ dataStatus: 'published' });
+      const container = document.getElementById('print-sheet-container');
+      container.innerHTML = '';
+
+      plants.forEach(p => {
+        const spec = LPAMS_API.getSpeciesById(p.speciesId) || {};
+        const card = document.createElement('div');
+        card.className = 'qr-print-card';
+        card.innerHTML = `
+          <div class="qr-print-top">
+            <span class="qr-print-tag">🌱 UDON EXPO 2026</span>
+            <span class="badge" style="background:#fde6f2; color:var(--primary);">${p.zoneCode}</span>
+          </div>
+          <div class="qr-canvas-holder" id="qrcode-${p.id}"></div>
+          <h4 style="font-size:13px; font-weight:800; margin-top:6px;">${spec.nameTh || 'ต้นไม้จัดแสดง'}</h4>
+          <p style="font-size:10px; font-style:italic; color:var(--text-muted);">${spec.nameScientific || ''}</p>
+          <div style="background:#0f172a; color:#fff; border-radius:6px; padding:4px; font-size:11px; font-weight:800; font-family:monospace; margin-top:8px;">
+            ${p.treeId}
+          </div>
+        `;
+        container.appendChild(card);
+
+        // Generate high-res QR code pointing to visitor app
+        const appUrl = `${window.location.origin}${window.location.pathname.replace('admin.html', 'index.html')}?tree_id=${p.treeId}&zone=${p.zoneCode}`;
+        new QRCode(document.getElementById(`qrcode-${p.id}`), {
+          text: appUrl,
+          width: 128,
+          height: 128,
+          colorDark : "#0f172a",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.H
+        });
+      });
+    }
+
+    // 9. Export & Backup
+    function downloadJSONBackup() {
+      const json = LPAMS_API.exportFullDatabaseJSON();
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `LPAMS_UdonExpo2026_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("💾 ดาวน์โหลดไฟล์สำรองข้อมูล JSON สำเร็จ!");
+    }
+  </script>
+
+  <!-- Mobile Bottom Quick Navigation Bar (Field Friendly) -->
+  <nav class="admin-mobile-nav">
+    <button class="mobile-nav-item active" id="mobNav-dashboard" onclick="switchAdminTab('dashboard')">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>ภาพรวม</span>
+    </button>
+    <button class="mobile-nav-item" id="mobNav-inventory" onclick="switchAdminTab('inventory')">
+      <i class="fa-solid fa-tree"></i>
+      <span>ทะเบียน</span>
+    </button>
+    <button class="mobile-nav-item" id="mobNav-observations" onclick="switchAdminTab('observations')">
+      <i class="fa-solid fa-notes-medical"></i>
+      <span>ตรวจพืช</span>
+    </button>
+    <button class="mobile-nav-item" id="mobNav-stock" onclick="switchAdminTab('stock')">
+      <i class="fa-solid fa-store"></i>
+      <span>สต็อก</span>
+    </button>
+    <button class="mobile-nav-item" onclick="toggleSidebar(true)">
+      <i class="fa-solid fa-bars"></i>
+      <span>เมนู</span>
+    </button>
+  </nav>
+
+</body>
+</html>
