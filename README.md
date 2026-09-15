@@ -257,11 +257,17 @@ Detailed documentation is available in [`backen/docs/`](backen/docs/):
 
 ## 📜 License
 
-This project is developed for the **International Horticultural Expo 2026, Udon Thani, Thailand** (งานมหกรรมพืชสวนโลก จ.อุดรธานี พ.ศ. 2569).
+**All Rights Reserved** — ระบบนี้เป็นผลงานที่พัฒนาขึ้นเองทั้งหมด โดยใช้งานมหกรรมพืชสวนโลก จ.อุดรธานี พ.ศ. 2569 เป็น case study ต้นแบบในการออกแบบระบบ
+
+ห้ามนำไปใช้ ดัดแปลง หรือเผยแพร่โดยไม่ได้รับอนุญาต
+
+> This is a proprietary system independently developed as a demonstration of Living Plant Asset Management capabilities. The Udon Thani International Horticultural Expo 2026 is used as a reference case study.  
+> Unauthorized use, modification, or distribution is prohibited.
 
 ---
 
 <p align="center">
-  🌿 Built with ❤️ for Udon Thani Horticultural Expo 2026 🌿<br>
-  <strong>Living Plant Asset Management System</strong>
+  🌿 Independently Built & Designed 🌿<br>
+  <strong>Living Plant Asset Management System</strong><br>
+  <sub>Portfolio & Service Demo</sub>
 </p>
